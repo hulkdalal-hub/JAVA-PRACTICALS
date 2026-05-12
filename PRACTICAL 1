@@ -1,0 +1,71 @@
+-- Create Database
+CREATE DATABASE CollegeDB;
+
+-- Use Database
+USE CollegeDB;
+
+-- Create Student Table
+CREATE TABLE Student (
+    StudentID INT PRIMARY KEY AUTO_INCREMENT,
+    Name VARCHAR(100),
+    Email VARCHAR(100) UNIQUE,
+    Age INT,
+    Address VARCHAR(200)
+);
+
+-- Create Instructor Table
+CREATE TABLE Instructor (
+    InstructorID INT PRIMARY KEY AUTO_INCREMENT,
+    Name VARCHAR(100),
+    Email VARCHAR(100) UNIQUE,
+    Department VARCHAR(100)
+);
+
+-- Create Course Table
+CREATE TABLE Course (
+    CourseID INT PRIMARY KEY AUTO_INCREMENT,
+    CourseName VARCHAR(100),
+    Credits INT,
+    InstructorID INT,
+    FOREIGN KEY (InstructorID) REFERENCES Instructor(InstructorID)
+);
+
+-- Create Enrollment Table
+CREATE TABLE Enrollment (
+    EnrollmentID INT PRIMARY KEY AUTO_INCREMENT,
+    StudentID INT,
+    CourseID INT,
+    EnrollmentDate DATE,
+    FOREIGN KEY (StudentID) REFERENCES Student(StudentID),
+    FOREIGN KEY (CourseID) REFERENCES Course(CourseID)
+);
+
+-- Insert Sample Data into Student
+INSERT INTO Student (Name, Email, Age, Address)
+VALUES
+('Aditya', 'aditya@gmail.com', 20, 'Pune'),
+('Rahul', 'rahul@gmail.com', 21, 'Mumbai');
+
+-- Insert Sample Data into Instructor
+INSERT INTO Instructor (Name, Email, Department)
+VALUES
+('Dr. Sharma', 'sharma@gmail.com', 'Computer Science'),
+('Prof. Mehta', 'mehta@gmail.com', 'Information Technology');
+
+-- Insert Sample Data into Course
+INSERT INTO Course (CourseName, Credits, InstructorID)
+VALUES
+('DBMS', 4, 1),
+('Java Programming', 3, 2);
+
+-- Insert Sample Data into Enrollment
+INSERT INTO Enrollment (StudentID, CourseID, EnrollmentDate)
+VALUES
+(1, 1, '2026-05-12'),
+(2, 2, '2026-05-12');
+
+-- Display Tables
+SELECT * FROM Student;
+SELECT * FROM Instructor;
+SELECT * FROM Course;
+SELECT * FROM Enrollment;
