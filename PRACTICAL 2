@@ -1,0 +1,245 @@
+-- =========================================
+-- Student Course Management System
+-- Views and Indexing in MySQL
+-- =========================================
+
+-- Create Database
+CREATE DATABASE CollegeDB;
+
+-- Use Database
+USE CollegeDB;
+
+-- =========================================
+-- 1. CREATE TABLES
+-- =========================================
+
+-- Student Table
+CREATE TABLE Student (
+    StudentID INT PRIMARY KEY,
+    Name VARCHAR(100),
+    Email VARCHAR(100),
+    Age INT,
+    Address VARCHAR(200)
+);
+
+-- Instructor Table
+CREATE TABLE Instructor (
+    InstructorID INT PRIMARY KEY,
+    Name VARCHAR(100),
+    Email VARCHAR(100),
+    Department VARCHAR(100)
+);
+
+-- Course Table
+CREATE TABLE Course (
+    CourseID INT PRIMARY KEY,
+    CourseName VARCHAR(100),
+    Credits INT,
+    InstructorID INT,
+    FOREIGN KEY (InstructorID) REFERENCES Instructor(InstructorID)
+);
+
+-- Enrollment Table
+CREATE TABLE Enrollment (
+    EnrollmentID INT PRIMARY KEY,
+    StudentID INT,
+    CourseID INT,
+    EnrollmentDate DATE,
+    FOREIGN KEY (StudentID) REFERENCES Student(StudentID),
+    FOREIGN KEY (CourseID) REFERENCES Course(CourseID)
+);
+
+-- =========================================
+-- 2. INSERT SAMPLE DATA
+-- =========================================
+
+-- Insert into Student
+INSERT INTO Student VALUES
+(1, 'Aditya', 'aditya@gmail.com', 20, 'Pune'),
+(2, 'Rahul', 'rahul@gmail.com', 21, 'Mumbai'),
+(3, 'Aman', 'aman@gmail.com', 19, 'Nashik'),
+(4, 'Sneha', 'sneha@gmail.com', 22, 'Delhi');
+
+-- Insert into Instructor
+INSERT INTO Instructor VALUES
+(101, 'Dr Sharma', 'sharma@gmail.com', 'Computer Science'),
+(102, 'Prof Mehta', 'mehta@gmail.com', 'Information Technology');
+
+-- Insert into Course
+INSERT INTO Course VALUES
+(201, 'DBMS', 4, 101),
+(202, 'Data Structures', 5, 101),
+(203, 'Java Programming', 3, 102);
+
+-- Insert into Enrollment
+INSERT INTO Enrollment VALUES
+(1, 1, 201, '2026-05-12'),
+(2, 1, 202, '2026-05-12'),
+(3, 2, 201, '2026-05-12'),
+(4, 3, 203, '2026-05-12'),
+(5, 4, 202, '2026-05-12');
+
+-- =========================================
+-- 3. CREATE VIEW
+-- =========================================
+
+CREATE VIEW StudentCourseView AS
+SELECT
+    S.StudentID,
+    S.Name AS StudentName,
+    C.CourseName,
+    C.Credits,
+    I.Name AS InstructorName
+FROM Student S
+JOIN Enrollment E
+ON S.StudentID = E.StudentID
+JOIN Course C
+ON E.CourseID = C.CourseID
+JOIN Instructor I
+ON C.InstructorID = I.InstructorID;
+
+-- Display View
+SELECT * FROM StudentCourseView;
+
+-- =========================================
+-- 4. UPDATE USING VIEW
+-- =========================================
+
+UPDATE Course
+SET Credits = 5
+WHERE CourseName = 'Data Structures';
+
+-- Check Updated Data
+SELECT * FROM StudentCourseView;
+
+-- =========================================
+-- 5. CREATE INDEXES
+-- =========================================
+
+CREATE INDEX idx_student_name
+ON Student(Name);
+
+CREATE INDEX idx_course_name
+ON Course(CourseName);
+
+CREATE INDEX idx_enrollment_student
+ON Enrollment(StudentID);
+
+-- =========================================
+-- 6. CHECK QUERY PERFORMANCE
+-- =========================================
+
+-- Before/After Indexing
+EXPLAIN
+SELECT * FROM Student
+WHERE Name = 'Aditya';
+
+EXPLAIN
+SELECT * FROM Course
+WHERE CourseName = 'DBMS';
+
+-- =========================================
+-- 7. ADDITIONAL QUERIES
+-- =========================================
+
+-- 1. Total students enrolled in each course
+SELECT
+    C.CourseName,
+    COUNT(E.StudentID) AS Total_Students
+FROM Course C
+LEFT JOIN Enrollment E
+ON C.CourseID = E.CourseID
+GROUP BY C.CourseName;
+
+-- 2. Youngest student under each instructor
+SELECT
+    I.InstructorID,
+    I.Name AS InstructorName,
+    S.StudentID,
+    S.Name AS StudentName,
+    S.Age
+FROM Instructor I
+JOIN Course C
+ON I.InstructorID = C.InstructorID
+JOIN Enrollment E
+ON C.CourseID = E.CourseID
+JOIN Student S
+ON S.StudentID = E.StudentID
+WHERE S.Age = (
+    SELECT MIN(S2.Age)
+    FROM Course C2
+    JOIN Enrollment E2
+    ON C2.CourseID = E2.CourseID
+    JOIN Student S2
+    ON S2.StudentID = E2.StudentID
+    WHERE C2.InstructorID = I.InstructorID
+);
+
+-- 3. Number of courses in each department
+SELECT
+    I.Department,
+    COUNT(C.CourseID) AS Total_Courses
+FROM Instructor I
+LEFT JOIN Course C
+ON I.InstructorID = C.InstructorID
+GROUP BY I.Department;
+
+-- 4. Student details sorted by age
+SELECT
+    StudentID,
+    Name,
+    Email,
+    Age,
+    Address
+FROM Student
+ORDER BY Age ASC;
+
+-- 5. Students older than 20 in each course
+SELECT
+    S.StudentID,
+    S.Name,
+    S.Age,
+    C.CourseName
+FROM Student S
+JOIN Enrollment E
+ON S.StudentID = E.StudentID
+JOIN Course C
+ON C.CourseID = E.CourseID
+WHERE S.Age > 20
+ORDER BY C.CourseName;
+
+-- 6. Students along with enrolled courses
+SELECT
+    S.Name AS StudentName,
+    C.CourseName
+FROM Student S
+JOIN Enrollment E
+ON S.StudentID = E.StudentID
+JOIN Course C
+ON E.CourseID = C.CourseID;
+
+-- 7. Total enrollments per month
+SELECT
+    MONTH(EnrollmentDate) AS Month_Number,
+    COUNT(*) AS Total_Enrollments
+FROM Enrollment
+GROUP BY MONTH(EnrollmentDate);
+
+-- 8. Instructors teaching more than 2 courses
+SELECT
+    I.Name AS InstructorName,
+    COUNT(C.CourseID) AS Total_Courses
+FROM Instructor I
+JOIN Course C
+ON I.InstructorID = C.InstructorID
+GROUP BY I.Name
+HAVING COUNT(C.CourseID) > 2;
+
+-- 9. Students whose names start with 'A'
+SELECT *
+FROM Student
+WHERE Name LIKE 'A%';
+
+-- =========================================
+-- END OF PRACTICAL
+-- =========================================
