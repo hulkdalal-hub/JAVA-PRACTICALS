@@ -1,0 +1,110 @@
+Title: Develop a Customer Order Management System to Retrieve Data Using SQL Joins
+
+1. Aim
+To understand and implement various SQL joins (INNER, LEFT, RIGHT, FULL OUTER) to retrieve combined records
+from multiple related tables.
+
+2. Objectives
+● To learn the purpose and application of SQL joins.
+● To retrieve data involving multiple tables using different join types.
+● To understand the difference between matched and unmatched records.
+● To analyze customer and order relationships using SQL.
+
+3. Theory
+3.1 What Are SQL Joins?
+SQL Joins allow retrieval of data from two or more related tables using a common field (usually a primary key–foreign
+key relationship).
+3.2 Types of Joins
+a) INNER JOIN
+Returns only matching records from both tables.
+
+Syntax:
+
+b) LEFT JOIN (LEFT OUTER JOIN)
+Returns all records from the left table and matched records from the right table.
+
+Syntax:
+
+c) RIGHT JOIN (RIGHT OUTER JOIN)
+Returns all records from the right table and matched records from the left table.
+
+Syntax:
+
+d) FULL OUTER JOIN
+Returns all records from both tables, matched and unmatched.
+
+4. Tasks
+1. Retrieve all customer orders using INNER JOIN.
+2. Retrieve all customers including those without orders using LEFT JOIN.
+3. Retrieve all orders including those with missing customer details using RIGHT JOIN.
+4. Retrieve complete list of customers and orders using FULL OUTER JOIN.
+
+5. Program / SQL
+5.1 Creating Base Tables
+CREATE TABLE Customer (
+CustomerID INT PRIMARY KEY,
+CustomerName VARCHAR(100),
+Email VARCHAR(100)
+);
+CREATE TABLE Orders (
+OrderID INT PRIMARY KEY,
+CustomerID INT,
+OrderDate DATE,
+Amount DECIMAL(10,2),
+FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID)
+);
+
+5.2 INNER JOIN
+
+Retrieve customers who have placed orders.
+SELECT
+C.CustomerID, C.CustomerName,
+O.OrderID, O.OrderDate, O.Amount
+FROM Customer C
+INNER JOIN Orders O
+ON C.CustomerID = O.CustomerID;
+
+5.3 LEFT JOIN
+Retrieve all customers including those with no orders.
+SELECT
+C.CustomerID, C.CustomerName,
+O.OrderID, O.OrderDate, O.Amount
+FROM Customer C
+LEFT JOIN Orders O
+ON C.CustomerID = O.CustomerID;
+
+5.4 RIGHT JOIN
+Retrieve all orders, including those that have no matching customer.
+SELECT
+C.CustomerID, C.CustomerName,
+O.OrderID, O.OrderDate, O.Amount
+FROM Customer C
+RIGHT JOIN Orders O
+ON C.CustomerID = O.CustomerID;
+
+5.5 FULL OUTER JOIN
+Retrieve all data, whether matched or unmatched.
+Note:MySQL does not support FULL OUTER JOIN directly; we use UNION.
+SELECT
+C.CustomerID, C.CustomerName,
+O.OrderID, O.OrderDate, O.Amount
+FROM Customer C
+
+LEFT JOIN Orders O
+ON C.CustomerID = O.CustomerID
+UNION
+SELECT
+C.CustomerID, C.CustomerName,
+O.OrderID, O.OrderDate, O.Amount
+FROM Customer C
+RIGHT JOIN Orders O
+ON C.CustomerID = O.CustomerID;
+
+6. Output
+● Successfully retrieved order details using INNER JOIN.
+● Retrieved all customers irrespective of order status using LEFT JOIN.
+● Retrieved all orders including unmatched records using RIGHT JOIN.
+● Displayed complete combined records using FULL OUTER JOIN.
+7. Conclusion
+This experiment demonstrated the practical usage of SQL joins to retrieve related records from multiple tables. It
+enhanced understanding of combining data using INNER, LEFT, RIGHT, and FULL OUTER JOIN operations.
