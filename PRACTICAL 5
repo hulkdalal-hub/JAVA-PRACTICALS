@@ -1,0 +1,119 @@
+-- =========================================
+-- Sales Management System
+-- Stored Procedures and Functions in MySQL
+-- =========================================
+
+-- Create Database
+CREATE DATABASE SalesDB;
+
+-- Use Database
+USE SalesDB;
+
+-- =========================================
+-- 1. CREATE SALES TABLE
+-- =========================================
+
+CREATE TABLE Sales (
+    sale_id INT PRIMARY KEY,
+    customer_name VARCHAR(50),
+    amount DECIMAL(10,2),
+    sale_date DATE
+);
+
+-- =========================================
+-- 2. STORED PROCEDURE TO INSERT SALES DATA
+-- =========================================
+
+DELIMITER $$
+
+CREATE PROCEDURE add_sale (
+    IN p_sale_id INT,
+    IN p_customer_name VARCHAR(50),
+    IN p_amount DECIMAL(10,2)
+)
+BEGIN
+    INSERT INTO Sales
+    VALUES (
+        p_sale_id,
+        p_customer_name,
+        p_amount,
+        CURDATE()
+    );
+
+    SELECT 'Sale record inserted successfully' AS Message;
+END $$
+
+DELIMITER ;
+
+-- =========================================
+-- 3. FUNCTION TO CALCULATE TOTAL SALES
+-- =========================================
+
+DELIMITER $$
+
+CREATE FUNCTION get_total_sales()
+RETURNS DECIMAL(10,2)
+DETERMINISTIC
+BEGIN
+    DECLARE total DECIMAL(10,2);
+
+    SELECT SUM(amount)
+    INTO total
+    FROM Sales;
+
+    RETURN total;
+END $$
+
+DELIMITER ;
+
+-- =========================================
+-- 4. EXECUTE STORED PROCEDURE
+-- =========================================
+
+CALL add_sale(101, 'Rahul Sharma', 4500);
+
+CALL add_sale(102, 'Neha Verma', 3200);
+
+CALL add_sale(103, 'Aditya Baglane', 5500);
+
+-- =========================================
+-- 5. EXECUTE FUNCTION
+-- =========================================
+
+SELECT get_total_sales() AS Total_Sales;
+
+-- =========================================
+-- 6. DISPLAY SALES TABLE
+-- =========================================
+
+SELECT * FROM Sales;
+
+-- =========================================
+-- 7. ADDITIONAL PRACTICE QUERIES
+-- =========================================
+
+-- Display sales greater than 4000
+SELECT *
+FROM Sales
+WHERE amount > 4000;
+
+-- Sort sales amount in descending order
+SELECT *
+FROM Sales
+ORDER BY amount DESC;
+
+-- Count total number of sales
+SELECT COUNT(*) AS Total_Records
+FROM Sales;
+
+-- Find maximum sale amount
+SELECT MAX(amount) AS Highest_Sale
+FROM Sales;
+
+-- Find minimum sale amount
+SELECT MIN(amount) AS Lowest_Sale
+FROM Sales;
+
+-- =========================================
+-- END OF PRACTICAL
+-- =========================================
