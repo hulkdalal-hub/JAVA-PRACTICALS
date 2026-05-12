@@ -1,0 +1,236 @@
+-- =========================================
+-- Employee Management System
+-- Triggers and Cursors in MySQL
+-- =========================================
+
+-- Create Database
+CREATE DATABASE EmployeeDB;
+
+-- Use Database
+USE EmployeeDB;
+
+-- =========================================
+-- 1. CREATE EMPLOYEE TABLE
+-- =========================================
+
+CREATE TABLE Employees (
+    emp_id INT PRIMARY KEY,
+    emp_name VARCHAR(50),
+    department VARCHAR(30),
+    salary DECIMAL(10,2)
+);
+
+-- =========================================
+-- 2. CREATE AUDIT TABLE
+-- =========================================
+
+CREATE TABLE Employee_Audit (
+    audit_id INT AUTO_INCREMENT PRIMARY KEY,
+    emp_id INT,
+    action_type VARCHAR(10),
+    old_salary DECIMAL(10,2),
+    new_salary DECIMAL(10,2),
+    action_date DATETIME
+);
+
+-- =========================================
+-- 3. INSERT SAMPLE DATA
+-- =========================================
+
+INSERT INTO Employees VALUES
+(101, 'Aditya', 'IT', 50000),
+(102, 'Rahul', 'HR', 40000),
+(103, 'Sneha', 'IT', 55000),
+(104, 'Aman', 'Finance', 45000);
+
+-- =========================================
+-- 4. TRIGGER FOR INSERT
+-- =========================================
+
+DELIMITER $$
+
+CREATE TRIGGER trg_employee_insert
+AFTER INSERT ON Employees
+FOR EACH ROW
+BEGIN
+    INSERT INTO Employee_Audit
+    (
+        emp_id,
+        action_type,
+        new_salary,
+        action_date
+    )
+    VALUES
+    (
+        NEW.emp_id,
+        'INSERT',
+        NEW.salary,
+        NOW()
+    );
+END $$
+
+DELIMITER ;
+
+-- =========================================
+-- 5. TRIGGER FOR UPDATE
+-- =========================================
+
+DELIMITER $$
+
+CREATE TRIGGER trg_employee_update
+AFTER UPDATE ON Employees
+FOR EACH ROW
+BEGIN
+    INSERT INTO Employee_Audit
+    (
+        emp_id,
+        action_type,
+        old_salary,
+        new_salary,
+        action_date
+    )
+    VALUES
+    (
+        OLD.emp_id,
+        'UPDATE',
+        OLD.salary,
+        NEW.salary,
+        NOW()
+    );
+END $$
+
+DELIMITER ;
+
+-- =========================================
+-- 6. TRIGGER FOR DELETE
+-- =========================================
+
+DELIMITER $$
+
+CREATE TRIGGER trg_employee_delete
+AFTER DELETE ON Employees
+FOR EACH ROW
+BEGIN
+    INSERT INTO Employee_Audit
+    (
+        emp_id,
+        action_type,
+        old_salary,
+        action_date
+    )
+    VALUES
+    (
+        OLD.emp_id,
+        'DELETE',
+        OLD.salary,
+        NOW()
+    );
+END $$
+
+DELIMITER ;
+
+-- =========================================
+-- 7. TEST TRIGGERS
+-- =========================================
+
+-- Insert Operation
+INSERT INTO Employees VALUES
+(105, 'Neha', 'IT', 60000);
+
+-- Update Operation
+UPDATE Employees
+SET salary = 65000
+WHERE emp_id = 105;
+
+-- Delete Operation
+DELETE FROM Employees
+WHERE emp_id = 102;
+
+-- =========================================
+-- 8. CURSOR FOR SALARY INCREMENT
+-- =========================================
+
+DELIMITER $$
+
+CREATE PROCEDURE increment_it_salary()
+BEGIN
+
+    DECLARE done INT DEFAULT FALSE;
+    DECLARE v_emp_id INT;
+    DECLARE v_salary DECIMAL(10,2);
+
+    DECLARE emp_cursor CURSOR FOR
+    SELECT emp_id, salary
+    FROM Employees
+    WHERE department = 'IT';
+
+    DECLARE CONTINUE HANDLER
+    FOR NOT FOUND SET done = TRUE;
+
+    OPEN emp_cursor;
+
+    read_loop: LOOP
+
+        FETCH emp_cursor
+        INTO v_emp_id, v_salary;
+
+        IF done THEN
+            LEAVE read_loop;
+        END IF;
+
+        UPDATE Employees
+        SET salary = v_salary * 1.10
+        WHERE emp_id = v_emp_id;
+
+    END LOOP;
+
+    CLOSE emp_cursor;
+
+END $$
+
+DELIMITER ;
+
+-- =========================================
+-- 9. EXECUTE CURSOR PROCEDURE
+-- =========================================
+
+CALL increment_it_salary();
+
+-- =========================================
+-- 10. DISPLAY TABLES
+-- =========================================
+
+-- Display Employees Table
+SELECT * FROM Employees;
+
+-- Display Audit Table
+SELECT * FROM Employee_Audit;
+
+-- =========================================
+-- 11. ADDITIONAL PRACTICE QUERIES
+-- =========================================
+
+-- Employees with salary greater than 50000
+SELECT *
+FROM Employees
+WHERE salary > 50000;
+
+-- Sort employees by salary descending
+SELECT *
+FROM Employees
+ORDER BY salary DESC;
+
+-- Count employees department-wise
+SELECT
+    department,
+    COUNT(*) AS Total_Employees
+FROM Employees
+GROUP BY department;
+
+-- Find highest salary
+SELECT MAX(salary) AS Highest_Salary
+FROM Employees;
+
+-- =========================================
+-- END OF PRACTICAL
+-- =========================================
