@@ -1,0 +1,190 @@
+-- =========================================
+-- Advanced Querying in Student Course Management System
+-- Using WHERE, ORDER BY, GROUP BY & Nested Subqueries
+-- =========================================
+
+-- Create Database
+CREATE DATABASE CollegeDB;
+
+-- Use Database
+USE CollegeDB;
+
+-- =========================================
+-- 1. CREATE TABLES
+-- =========================================
+
+-- Student Table
+CREATE TABLE Student (
+    StudentID INT PRIMARY KEY,
+    Name VARCHAR(100),
+    Email VARCHAR(100),
+    Age INT,
+    Address VARCHAR(200)
+);
+
+-- Instructor Table
+CREATE TABLE Instructor (
+    InstructorID INT PRIMARY KEY,
+    Name VARCHAR(100),
+    Email VARCHAR(100),
+    Department VARCHAR(100)
+);
+
+-- Course Table
+CREATE TABLE Course (
+    CourseID INT PRIMARY KEY,
+    CourseName VARCHAR(100),
+    Credits INT,
+    InstructorID INT,
+    FOREIGN KEY (InstructorID) REFERENCES Instructor(InstructorID)
+);
+
+-- Enrollment Table
+CREATE TABLE Enrollment (
+    EnrollmentID INT PRIMARY KEY,
+    StudentID INT,
+    CourseID INT,
+    EnrollmentDate DATE,
+    FOREIGN KEY (StudentID) REFERENCES Student(StudentID),
+    FOREIGN KEY (CourseID) REFERENCES Course(CourseID)
+);
+
+-- =========================================
+-- 2. INSERT SAMPLE DATA
+-- =========================================
+
+-- Insert into Student
+INSERT INTO Student VALUES
+(1, 'Aditya', 'aditya@gmail.com', 20, 'Pune'),
+(2, 'Rahul', 'rahul@gmail.com', 22, 'Mumbai'),
+(3, 'Aman', 'aman@gmail.com', 19, 'Nashik'),
+(4, 'Sneha', 'sneha@gmail.com', 23, 'Delhi');
+
+-- Insert into Instructor
+INSERT INTO Instructor VALUES
+(101, 'Dr Sharma', 'sharma@gmail.com', 'Computer Science'),
+(102, 'Prof Mehta', 'mehta@gmail.com', 'Information Technology');
+
+-- Insert into Course
+INSERT INTO Course VALUES
+(201, 'DBMS', 4, 101),
+(202, 'Data Structures', 5, 101),
+(203, 'Java Programming', 3, 102);
+
+-- Insert into Enrollment
+INSERT INTO Enrollment VALUES
+(1, 1, 201, '2026-05-12'),
+(2, 1, 202, '2026-05-12'),
+(3, 2, 201, '2026-05-12'),
+(4, 3, 203, '2026-05-12'),
+(5, 4, 202, '2026-05-12');
+
+-- =========================================
+-- 3. FILTERING USING WHERE CLAUSE
+-- =========================================
+
+-- a) Find students above age 20
+SELECT
+    StudentID,
+    Name,
+    Age
+FROM Student
+WHERE Age > 20;
+
+-- b) Filter courses taught by instructor 'Dr Sharma'
+SELECT
+    C.CourseID,
+    C.CourseName
+FROM Course C
+JOIN Instructor I
+ON C.InstructorID = I.InstructorID
+WHERE I.Name = 'Dr Sharma';
+
+-- =========================================
+-- 4. SORTING USING ORDER BY
+-- =========================================
+
+-- a) Sort students alphabetically
+SELECT
+    StudentID,
+    Name,
+    Age
+FROM Student
+ORDER BY Name ASC;
+
+-- b) Sort courses by credits descending
+SELECT
+    CourseID,
+    CourseName,
+    Credits
+FROM Course
+ORDER BY Credits DESC;
+
+-- =========================================
+-- 5. AGGREGATION USING GROUP BY
+-- =========================================
+
+-- a) Count students per course
+SELECT
+    C.CourseName,
+    COUNT(E.StudentID) AS Total_Students
+FROM Course C
+LEFT JOIN Enrollment E
+ON C.CourseID = E.CourseID
+GROUP BY C.CourseName;
+
+-- b) Average age of students
+SELECT
+    AVG(Age) AS Average_Student_Age
+FROM Student;
+
+-- =========================================
+-- 6. NESTED SUBQUERIES
+-- =========================================
+
+-- a) Students older than average student age
+SELECT *
+FROM Student
+WHERE Age >
+(
+    SELECT AVG(Age)
+    FROM Student
+);
+
+-- b) Courses having more enrollments than average enrollments
+SELECT
+    C.CourseName
+FROM Course C
+JOIN Enrollment E
+ON C.CourseID = E.CourseID
+GROUP BY C.CourseName
+HAVING COUNT(E.StudentID) >
+(
+    SELECT AVG(Cnt)
+    FROM
+    (
+        SELECT COUNT(StudentID) AS Cnt
+        FROM Enrollment
+        GROUP BY CourseID
+    ) AS AvgTable
+);
+
+-- =========================================
+-- 7. ADDITIONAL PRACTICE QUERIES
+-- =========================================
+
+-- Display all students
+SELECT * FROM Student;
+
+-- Display all courses
+SELECT * FROM Course;
+
+-- Display all instructors
+SELECT * FROM Instructor;
+
+-- Display all enrollments
+SELECT * FROM Enrollment;
+
+-- =========================================
+-- END OF PRACTICAL
+-- =========================================
