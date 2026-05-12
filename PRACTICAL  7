@@ -1,0 +1,211 @@
+// =========================================
+// MongoDB Aggregation and Indexing
+// NoSQL Database Introduction
+// =========================================
+
+// =========================================
+// 1. CREATE DATABASE
+// =========================================
+
+use StudentDB;
+
+// =========================================
+// 2. CREATE COLLECTION AND INSERT DATA
+// =========================================
+
+db.users.insertMany([
+    {
+        name: "Alice",
+        age: 21,
+        sales: 5000,
+        city: "Delhi"
+    },
+    {
+        name: "Bob",
+        age: 25,
+        sales: 7000,
+        city: "Mumbai"
+    },
+    {
+        name: "Charlie",
+        age: 23,
+        sales: 6500,
+        city: "Delhi"
+    },
+    {
+        name: "Aditya",
+        age: 22,
+        sales: 8000,
+        city: "Pune"
+    }
+]);
+
+// =========================================
+// 3. CRUD OPERATIONS
+// =========================================
+
+/*
+-----------------------------------------
+CREATE
+-----------------------------------------
+*/
+
+db.users.insertOne({
+    name: "Rahul",
+    age: 24,
+    sales: 7200,
+    city: "Mumbai"
+});
+
+/*
+-----------------------------------------
+READ
+-----------------------------------------
+*/
+
+// Display all records
+db.users.find();
+
+// Filter records by city
+db.users.find({ city: "Delhi" });
+
+// Find users with sales greater than 6000
+db.users.find({ sales: { $gt: 6000 } });
+
+/*
+-----------------------------------------
+UPDATE
+-----------------------------------------
+*/
+
+db.users.updateOne(
+    { name: "Alice" },
+    { $set: { sales: 5500 } }
+);
+
+// Update multiple records
+db.users.updateMany(
+    { city: "Mumbai" },
+    { $set: { city: "Mumbai City" } }
+);
+
+/*
+-----------------------------------------
+DELETE
+-----------------------------------------
+*/
+
+// Delete one record
+db.users.deleteOne({ name: "Charlie" });
+
+// Delete multiple records
+db.users.deleteMany({ city: "Mumbai City" });
+
+// =========================================
+// 4. AGGREGATION QUERIES
+// =========================================
+
+/*
+-----------------------------------------
+1. Calculate Average Age
+-----------------------------------------
+*/
+
+db.users.aggregate([
+    {
+        $group: {
+            _id: null,
+            average_age: { $avg: "$age" }
+        }
+    }
+]);
+
+/*
+-----------------------------------------
+2. Calculate Total Sales
+-----------------------------------------
+*/
+
+db.users.aggregate([
+    {
+        $group: {
+            _id: null,
+            total_sales: { $sum: "$sales" }
+        }
+    }
+]);
+
+/*
+-----------------------------------------
+3. Sales by City
+-----------------------------------------
+*/
+
+db.users.aggregate([
+    {
+        $group: {
+            _id: "$city",
+            total_city_sales: { $sum: "$sales" }
+        }
+    }
+]);
+
+/*
+-----------------------------------------
+4. Highest Sales
+-----------------------------------------
+*/
+
+db.users.aggregate([
+    {
+        $group: {
+            _id: null,
+            highest_sales: { $max: "$sales" }
+        }
+    }
+]);
+
+/*
+-----------------------------------------
+5. Sort Users by Sales
+-----------------------------------------
+*/
+
+db.users.aggregate([
+    {
+        $sort: { sales: -1 }
+    }
+]);
+
+// =========================================
+// 5. CREATE INDEX
+// =========================================
+
+// Create index on city field
+db.users.createIndex({ city: 1 });
+
+// Create index on sales field
+db.users.createIndex({ sales: 1 });
+
+// =========================================
+// 6. CHECK INDEXES
+// =========================================
+
+db.users.getIndexes();
+
+// =========================================
+// 7. PERFORMANCE CHECK
+// =========================================
+
+// Explain query execution
+db.users.find({ city: "Delhi" }).explain("executionStats");
+
+// =========================================
+// 8. DISPLAY FINAL DATA
+// =========================================
+
+db.users.find().pretty();
+
+// =========================================
+// END OF PRACTICAL
+// =========================================
