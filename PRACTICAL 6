@@ -1,75 +1,68 @@
-import java.util.Scanner;
+// Interface
+interface Shape {
 
-class Calculator {
+    void draw();
 
-    // Method Overloading for Power
-    public static double power(int base, int exponent) {
-        return Math.pow(base, exponent);
+    double calculateArea();
+}
+
+// Class 1
+class Circle implements Shape {
+
+    private double radius;
+
+    public Circle(double radius) {
+        this.radius = radius;
     }
 
-    public static double power(double base, double exponent) {
-        return Math.pow(base, exponent);
+    @Override
+    public void draw() {
+        System.out.println("Drawing Circle");
     }
 
-    public static double power(float base, int exponent) {
-        return Math.pow(base, exponent);
-    }
-
-    // Method Overloading for Absolute Value
-    public static int absolute(int num) {
-        return Math.abs(num);
-    }
-
-    public static double absolute(double num) {
-        return Math.abs(num);
-    }
-
-    public static long absolute(long num) {
-        return Math.abs(num);
+    @Override
+    public double calculateArea() {
+        return Math.PI * radius * radius;
     }
 }
 
+// Class 2
+class Rectangle implements Shape {
+
+    private double length;
+    private double width;
+
+    public Rectangle(double length, double width) {
+
+        this.length = length;
+        this.width = width;
+    }
+
+    @Override
+    public void draw() {
+        System.out.println("Drawing Rectangle");
+    }
+
+    @Override
+    public double calculateArea() {
+        return length * width;
+    }
+}
+
+// Main Class
 public class Main {
 
     public static void main(String[] args) {
 
-        Scanner sc = new Scanner(System.in);
+        Shape s1 = new Circle(5);
+        Shape s2 = new Rectangle(4, 6);
 
-        System.out.println("=== POWER CALCULATION ===");
+        s1.draw();
+        System.out.println("Circle Area: " + s1.calculateArea());
 
-        System.out.print("Enter integer base: ");
-        int ibase = sc.nextInt();
+        System.out.println();
 
-        System.out.print("Enter integer exponent: ");
-        int iexp = sc.nextInt();
-
-        System.out.println("Result: " + Calculator.power(ibase, iexp));
-
-        System.out.print("\nEnter double base: ");
-        double dbase = sc.nextDouble();
-
-        System.out.print("Enter double exponent: ");
-        double dexp = sc.nextDouble();
-
-        System.out.println("Result: " + Calculator.power(dbase, dexp));
-
-        System.out.println("\n=== ABSOLUTE VALUE ===");
-
-        System.out.print("Enter integer: ");
-        int inum = sc.nextInt();
-
-        System.out.println("Absolute: " + Calculator.absolute(inum));
-
-        System.out.print("Enter double: ");
-        double dnum = sc.nextDouble();
-
-        System.out.println("Absolute: " + Calculator.absolute(dnum));
-
-        System.out.print("Enter long: ");
-        long lnum = sc.nextLong();
-
-        System.out.println("Absolute: " + Calculator.absolute(lnum));
-
-        sc.close();
+        s2.draw();
+        System.out.println("Rectangle Area: " + s2.calculateArea());
     }
 }
