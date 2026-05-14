@@ -1,55 +1,31 @@
-class Animal {
+import java.util.Scanner;
 
-    protected String name;
-    protected int age;
+class Calculator {
 
-    // Constructor of Superclass
-    public Animal(String name, int age) {
-
-        this.name = name;
-        this.age = age;
+    // Method Overloading for Power
+    public static double power(int base, int exponent) {
+        return Math.pow(base, exponent);
     }
 
-    public void eat() {
-
-        System.out.println(name + " is eating.");
+    public static double power(double base, double exponent) {
+        return Math.pow(base, exponent);
     }
 
-    public void sleep() {
-
-        System.out.println(name + " is sleeping.");
-    }
-}
-
-// Subclass
-class Dog extends Animal {
-
-    private String breed;
-
-    // Constructor of Subclass
-    public Dog(String name, int age, String breed) {
-
-        super(name, age); // Call superclass constructor
-        this.breed = breed;
+    public static double power(float base, int exponent) {
+        return Math.pow(base, exponent);
     }
 
-    public void bark() {
-
-        System.out.println(name + " is barking.");
+    // Method Overloading for Absolute Value
+    public static int absolute(int num) {
+        return Math.abs(num);
     }
 
-    // Method overriding
-    @Override
-    public void eat() {
-
-        System.out.println(name + " is eating dog food.");
+    public static double absolute(double num) {
+        return Math.abs(num);
     }
 
-    public void displayDetails() {
-
-        System.out.println("Name: " + name);
-        System.out.println("Age: " + age);
-        System.out.println("Breed: " + breed);
+    public static long absolute(long num) {
+        return Math.abs(num);
     }
 }
 
@@ -57,14 +33,43 @@ public class Main {
 
     public static void main(String[] args) {
 
-        Dog d1 = new Dog("Tommy", 3, "Labrador");
+        Scanner sc = new Scanner(System.in);
 
-        d1.displayDetails();
+        System.out.println("=== POWER CALCULATION ===");
 
-        System.out.println();
+        System.out.print("Enter integer base: ");
+        int ibase = sc.nextInt();
 
-        d1.eat();   // Overridden method
-        d1.sleep(); // Inherited method
-        d1.bark();  // Subclass method
+        System.out.print("Enter integer exponent: ");
+        int iexp = sc.nextInt();
+
+        System.out.println("Result: " + Calculator.power(ibase, iexp));
+
+        System.out.print("\nEnter double base: ");
+        double dbase = sc.nextDouble();
+
+        System.out.print("Enter double exponent: ");
+        double dexp = sc.nextDouble();
+
+        System.out.println("Result: " + Calculator.power(dbase, dexp));
+
+        System.out.println("\n=== ABSOLUTE VALUE ===");
+
+        System.out.print("Enter integer: ");
+        int inum = sc.nextInt();
+
+        System.out.println("Absolute: " + Calculator.absolute(inum));
+
+        System.out.print("Enter double: ");
+        double dnum = sc.nextDouble();
+
+        System.out.println("Absolute: " + Calculator.absolute(dnum));
+
+        System.out.print("Enter long: ");
+        long lnum = sc.nextLong();
+
+        System.out.println("Absolute: " + Calculator.absolute(lnum));
+
+        sc.close();
     }
 }
