@@ -1,0 +1,272 @@
+package crud;
+
+import java.sql.*;
+import java.util.Scanner;
+
+public class Main {
+
+    static Scanner sc = new Scanner(System.in);
+
+    // Change according to your database
+    static final String URL =
+            "jdbc:mysql://localhost:3306/studentdb";
+
+    static final String USER = "root";
+
+    static final String PASSWORD = "root";
+
+    // Database Connection
+    public static Connection getConnection()
+            throws SQLException {
+
+        return DriverManager.getConnection(
+                URL, USER, PASSWORD);
+    }
+
+    // CREATE
+    public static void addStudent() {
+
+        String sql =
+                "INSERT INTO students (id, name, course, marks) VALUES (?, ?, ?, ?)";
+
+        try (
+                Connection con = getConnection();
+
+                PreparedStatement ps =
+                        con.prepareStatement(sql)
+        ) {
+
+            con.setAutoCommit(false);
+
+            System.out.print("Enter ID: ");
+
+            int id = sc.nextInt();
+            sc.nextLine();
+
+            System.out.print("Enter Name: ");
+
+            String name = sc.nextLine();
+
+            System.out.print("Enter Course: ");
+
+            String course = sc.nextLine();
+
+            System.out.print("Enter Marks: ");
+
+            double marks = sc.nextDouble();
+
+            ps.setInt(1, id);
+            ps.setString(2, name);
+            ps.setString(3, course);
+            ps.setDouble(4, marks);
+
+            ps.executeUpdate();
+
+            con.commit();
+
+            System.out.println(
+                    "Student added successfully.");
+
+        } catch (SQLException e) {
+
+            System.out.println(
+                    "Database error: " + e.getMessage());
+        }
+    }
+
+    // READ
+    public static void viewStudents() {
+
+        String sql = "SELECT * FROM students";
+
+        try (
+                Connection con = getConnection();
+
+                PreparedStatement ps =
+                        con.prepareStatement(sql);
+
+                ResultSet rs = ps.executeQuery()
+        ) {
+
+            System.out.println("\nStudent Records");
+
+            while (rs.next()) {
+
+                System.out.println(
+                        rs.getInt("id") + " | " +
+                        rs.getString("name") + " | " +
+                        rs.getString("course") + " | " +
+                        rs.getDouble("marks")
+                );
+            }
+
+        } catch (SQLException e) {
+
+            System.out.println(
+                    "Database error: " + e.getMessage());
+        }
+    }
+
+    // UPDATE
+    public static void updateStudent() {
+
+        String sql =
+                "UPDATE students SET marks = ? WHERE id = ?";
+
+        try (
+                Connection con = getConnection();
+
+                PreparedStatement ps =
+                        con.prepareStatement(sql)
+        ) {
+
+            con.setAutoCommit(false);
+
+            System.out.print("Enter Student ID: ");
+
+            int id = sc.nextInt();
+
+            System.out.print("Enter New Marks: ");
+
+            double marks = sc.nextDouble();
+
+            ps.setDouble(1, marks);
+            ps.setInt(2, id);
+
+            int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+
+                con.commit();
+
+                System.out.println(
+                        "Student updated successfully.");
+            }
+
+            else {
+
+                con.rollback();
+
+                System.out.println(
+                        "Student not found.");
+            }
+
+        } catch (SQLException e) {
+
+            System.out.println(
+                    "Database error: " + e.getMessage());
+        }
+    }
+
+    // DELETE
+    public static void deleteStudent() {
+
+        String sql =
+                "DELETE FROM students WHERE id = ?";
+
+        try (
+                Connection con = getConnection();
+
+                PreparedStatement ps =
+                        con.prepareStatement(sql)
+        ) {
+
+            con.setAutoCommit(false);
+
+            System.out.print("Enter Student ID: ");
+
+            int id = sc.nextInt();
+
+            ps.setInt(1, id);
+
+            int rows = ps.executeUpdate();
+
+            if (rows > 0) {
+
+                con.commit();
+
+                System.out.println(
+                        "Student deleted successfully.");
+            }
+
+            else {
+
+                con.rollback();
+
+                System.out.println(
+                        "Student not found.");
+            }
+
+        } catch (SQLException e) {
+
+            System.out.println(
+                    "Database error: " + e.getMessage());
+        }
+    }
+
+    // MAIN METHOD
+    public static void main(String[] args) {
+
+        int choice;
+
+        do {
+
+            System.out.println(
+                    "\n===== STUDENT MANAGEMENT =====");
+
+            System.out.println("1. Add Student");
+
+            System.out.println("2. View Students");
+
+            System.out.println("3. Update Student");
+
+            System.out.println("4. Delete Student");
+
+            System.out.println("5. Exit");
+
+            System.out.print("Enter choice: ");
+
+            choice = sc.nextInt();
+
+            switch (choice) {
+
+                case 1:
+
+                    addStudent();
+
+                    break;
+
+                case 2:
+
+                    viewStudents();
+
+                    break;
+
+                case 3:
+
+                    updateStudent();
+
+                    break;
+
+                case 4:
+
+                    deleteStudent();
+
+                    break;
+
+                case 5:
+
+                    System.out.println("Exiting...");
+
+                    break;
+
+                default:
+
+                    System.out.println("Invalid choice.");
+            }
+
+        } while (choice != 5);
+
+        sc.close();
+    }
+}
