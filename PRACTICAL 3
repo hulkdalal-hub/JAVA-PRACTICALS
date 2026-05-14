@@ -1,190 +1,75 @@
--- =========================================
--- Advanced Querying in Student Course Management System
--- Using WHERE, ORDER BY, GROUP BY & Nested Subqueries
--- =========================================
+import java.util.Scanner;
 
--- Create Database
-CREATE DATABASE CollegeDB;
+class Calculator {
 
--- Use Database
-USE CollegeDB;
+    // Method Overloading for Power
+    public static double power(int base, int exponent) {
+        return Math.pow(base, exponent);
+    }
 
--- =========================================
--- 1. CREATE TABLES
--- =========================================
+    public static double power(double base, double exponent) {
+        return Math.pow(base, exponent);
+    }
 
--- Student Table
-CREATE TABLE Student (
-    StudentID INT PRIMARY KEY,
-    Name VARCHAR(100),
-    Email VARCHAR(100),
-    Age INT,
-    Address VARCHAR(200)
-);
+    public static double power(float base, int exponent) {
+        return Math.pow(base, exponent);
+    }
 
--- Instructor Table
-CREATE TABLE Instructor (
-    InstructorID INT PRIMARY KEY,
-    Name VARCHAR(100),
-    Email VARCHAR(100),
-    Department VARCHAR(100)
-);
+    // Method Overloading for Absolute Value
+    public static int absolute(int num) {
+        return Math.abs(num);
+    }
 
--- Course Table
-CREATE TABLE Course (
-    CourseID INT PRIMARY KEY,
-    CourseName VARCHAR(100),
-    Credits INT,
-    InstructorID INT,
-    FOREIGN KEY (InstructorID) REFERENCES Instructor(InstructorID)
-);
+    public static double absolute(double num) {
+        return Math.abs(num);
+    }
 
--- Enrollment Table
-CREATE TABLE Enrollment (
-    EnrollmentID INT PRIMARY KEY,
-    StudentID INT,
-    CourseID INT,
-    EnrollmentDate DATE,
-    FOREIGN KEY (StudentID) REFERENCES Student(StudentID),
-    FOREIGN KEY (CourseID) REFERENCES Course(CourseID)
-);
+    public static long absolute(long num) {
+        return Math.abs(num);
+    }
+}
 
--- =========================================
--- 2. INSERT SAMPLE DATA
--- =========================================
+public class Main {
 
--- Insert into Student
-INSERT INTO Student VALUES
-(1, 'Aditya', 'aditya@gmail.com', 20, 'Pune'),
-(2, 'Rahul', 'rahul@gmail.com', 22, 'Mumbai'),
-(3, 'Aman', 'aman@gmail.com', 19, 'Nashik'),
-(4, 'Sneha', 'sneha@gmail.com', 23, 'Delhi');
+    public static void main(String[] args) {
 
--- Insert into Instructor
-INSERT INTO Instructor VALUES
-(101, 'Dr Sharma', 'sharma@gmail.com', 'Computer Science'),
-(102, 'Prof Mehta', 'mehta@gmail.com', 'Information Technology');
+        Scanner sc = new Scanner(System.in);
 
--- Insert into Course
-INSERT INTO Course VALUES
-(201, 'DBMS', 4, 101),
-(202, 'Data Structures', 5, 101),
-(203, 'Java Programming', 3, 102);
+        System.out.println("=== POWER CALCULATION ===");
 
--- Insert into Enrollment
-INSERT INTO Enrollment VALUES
-(1, 1, 201, '2026-05-12'),
-(2, 1, 202, '2026-05-12'),
-(3, 2, 201, '2026-05-12'),
-(4, 3, 203, '2026-05-12'),
-(5, 4, 202, '2026-05-12');
+        System.out.print("Enter integer base: ");
+        int ibase = sc.nextInt();
 
--- =========================================
--- 3. FILTERING USING WHERE CLAUSE
--- =========================================
+        System.out.print("Enter integer exponent: ");
+        int iexp = sc.nextInt();
 
--- a) Find students above age 20
-SELECT
-    StudentID,
-    Name,
-    Age
-FROM Student
-WHERE Age > 20;
+        System.out.println("Result: " + Calculator.power(ibase, iexp));
 
--- b) Filter courses taught by instructor 'Dr Sharma'
-SELECT
-    C.CourseID,
-    C.CourseName
-FROM Course C
-JOIN Instructor I
-ON C.InstructorID = I.InstructorID
-WHERE I.Name = 'Dr Sharma';
+        System.out.print("\nEnter double base: ");
+        double dbase = sc.nextDouble();
 
--- =========================================
--- 4. SORTING USING ORDER BY
--- =========================================
+        System.out.print("Enter double exponent: ");
+        double dexp = sc.nextDouble();
 
--- a) Sort students alphabetically
-SELECT
-    StudentID,
-    Name,
-    Age
-FROM Student
-ORDER BY Name ASC;
+        System.out.println("Result: " + Calculator.power(dbase, dexp));
 
--- b) Sort courses by credits descending
-SELECT
-    CourseID,
-    CourseName,
-    Credits
-FROM Course
-ORDER BY Credits DESC;
+        System.out.println("\n=== ABSOLUTE VALUE ===");
 
--- =========================================
--- 5. AGGREGATION USING GROUP BY
--- =========================================
+        System.out.print("Enter integer: ");
+        int inum = sc.nextInt();
 
--- a) Count students per course
-SELECT
-    C.CourseName,
-    COUNT(E.StudentID) AS Total_Students
-FROM Course C
-LEFT JOIN Enrollment E
-ON C.CourseID = E.CourseID
-GROUP BY C.CourseName;
+        System.out.println("Absolute: " + Calculator.absolute(inum));
 
--- b) Average age of students
-SELECT
-    AVG(Age) AS Average_Student_Age
-FROM Student;
+        System.out.print("Enter double: ");
+        double dnum = sc.nextDouble();
 
--- =========================================
--- 6. NESTED SUBQUERIES
--- =========================================
+        System.out.println("Absolute: " + Calculator.absolute(dnum));
 
--- a) Students older than average student age
-SELECT *
-FROM Student
-WHERE Age >
-(
-    SELECT AVG(Age)
-    FROM Student
-);
+        System.out.print("Enter long: ");
+        long lnum = sc.nextLong();
 
--- b) Courses having more enrollments than average enrollments
-SELECT
-    C.CourseName
-FROM Course C
-JOIN Enrollment E
-ON C.CourseID = E.CourseID
-GROUP BY C.CourseName
-HAVING COUNT(E.StudentID) >
-(
-    SELECT AVG(Cnt)
-    FROM
-    (
-        SELECT COUNT(StudentID) AS Cnt
-        FROM Enrollment
-        GROUP BY CourseID
-    ) AS AvgTable
-);
+        System.out.println("Absolute: " + Calculator.absolute(lnum));
 
--- =========================================
--- 7. ADDITIONAL PRACTICE QUERIES
--- =========================================
-
--- Display all students
-SELECT * FROM Student;
-
--- Display all courses
-SELECT * FROM Course;
-
--- Display all instructors
-SELECT * FROM Instructor;
-
--- Display all enrollments
-SELECT * FROM Enrollment;
-
--- =========================================
--- END OF PRACTICAL
--- =========================================
+        sc.close();
+    }
+}
